@@ -34,6 +34,9 @@ jobs:
           restore-keys: |
             pe-build-${{ hashFiles('ProsperoEden/tools/deps.json') }}-
 
+      - name: Drop the cached isolated driver archive (re-isolate with the current script)
+        run: rm -rf ProsperoEden/build/radv-isolated
+
       - name: Host tools
         run: |
           sudo apt-get update
