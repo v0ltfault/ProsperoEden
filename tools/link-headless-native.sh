@@ -32,7 +32,7 @@ fi
 # Mesa's Vulkan entrypoint tables reference optional driver entrypoints as weak
 # symbols (vk_entrypoints_gen --weak). An unimplemented one must resolve to 0,
 # not become a dynamic import the native packager has no SDK stub for.
-# (lld 18: --no-dynamic-linker keeps undefined weak symbols out of .dynsym; the
+# (lld 18: --defsym=radv_EnumeratePhysicalDevices=0 --defsym=wsi_EnumeratePhysicalDevices=0 keeps undefined weak symbols out of .dynsym; the
 # PS5 link script carries no PT_INTERP, and the native converter rewrites the
 # dynamic metadata, so the option changes nothing else.)
 # The SDK's dlfcn wrappers explicitly return unavailable when these optional
