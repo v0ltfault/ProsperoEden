@@ -1,3 +1,17 @@
+> ## PS5 firmware 7.40 (and likely other 7.xx): the "can't protect" fix
+>
+> This fork of [blackbearreloaded/ProsperoEden](https://github.com/blackbearreloaded/ProsperoEden) carries a fix for
+> consoles where **every game ends a few seconds after it loads** with
+> `[ProsperoEden] GPU worker: can't protect` / `session failed: Rendering failed: can't protect`
+> (on OpenGL followed by a Switch error `2010-0212`). Changing renderer, keys, firmware dump, game version or update
+> does not help, and jailbreaking the app with etaHEN makes the CPU JIT fail instead (`EDEN_JIT_ALIAS ... errno=13`).
+>
+> - **Prebuilt app:** [Releases](https://github.com/v0ltfault/ProsperoEden/releases) (`ProsperoEden-v1.000.070-fw740.zip`): copy `PPSA99008` over `/data/homebrew/PPSA99008`.
+> - **What and why:** [docs/FW740.md](docs/FW740.md). Upstream pull request: [blackbearreloaded/ProsperoEden#28](https://github.com/blackbearreloaded/ProsperoEden/pull/28).
+> - **Build it yourself:** `.github/workflows/build-fw740.yml` builds on a GitHub-hosted ubuntu-24.04 runner.
+>
+> Verified on a retail PS5 on 7.40: a large open-world game runs at its native 30 fps cap, un-jailbroken, as released.
+
 <p align="center">
   <img src="sce_sys/icon0.png" width="128" alt="ProsperoEden icon">
 </p>
