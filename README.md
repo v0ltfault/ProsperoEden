@@ -13,6 +13,12 @@
 > Verified on a retail PS5 on 7.40 only: a large open-world game runs at its native 30 fps cap, un-jailbroken, as released.
 > The permission rule behind it is probably the same across the 7.x line, but that is an expectation, not a test result.
 > If you run this on 7.01, 7.20, 7.61 or another 7.x firmware, a note of what happened would firm this up.
+> **Reports so far:** 7.40 (owner) - games run. 7.61 (one user, 2026-10-07) - the app opens and reaches its setup
+> screen; a game run is not confirmed yet because that console's keys were older than its firmware dump.
+>
+> **"Firmware NCA validation failed (code 21)"** on the setup screen is not this bug: code 21 is Eden's
+> `ErrorMissingKeyAreaKey`, i.e. your `prod.keys` was dumped from an older Switch firmware than the firmware
+> NCAs you copied in. Re-dump the keys on a Switch running that firmware or newer, or use an older firmware dump.
 
 <p align="center">
   <img src="sce_sys/icon0.png" width="128" alt="ProsperoEden icon">
