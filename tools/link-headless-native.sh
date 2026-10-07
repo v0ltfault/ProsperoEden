@@ -30,11 +30,9 @@ if [[ -n $radv_archive ]]; then
     tls_flags=()
 fi
 # Mesa's Vulkan entrypoint tables reference optional driver entrypoints as weak
-# symbols (vk_entrypoints_gen --weak). An unimplemented one must resolve to 0,
-# not become a dynamic import the native packager has no SDK stub for.
-# (lld 18: --defsym=radv_EnumeratePhysicalDevices=0 --defsym=wsi_EnumeratePhysicalDevices=0 keeps undefined weak symbols out of .dynsym; the
-# PS5 link script carries no PT_INTERP, and the native converter rewrites the
-# dynamic metadata, so the option changes nothing else.)
+# symbols (vk_entrypoints_gen --weak). RADV implements neither of these two
+# (vk_common_* serves them), and an undefined weak import has no SDK stub for
+# the native packager. Pin exactly these to 0; every other import stays as is.
 # The SDK's dlfcn wrappers explicitly return unavailable when these optional
 # weak hooks are null. This static frontend supplies no dynamic-loader hooks.
 "$template/.deps/native/ps5-payload-sdk/bin/prospero-lld" \
@@ -43,7 +41,7 @@ fi
     --defsym=__dlclose=0 --defsym=__dlerror=0 \
     -T "$template/tooling/native/ps5-pie.ld" -T "$root/tools/unwind.ld" \
     --eh-frame-hdr --gc-sections --version-script "$root/tools/app-symbols.map" -e _start \
-    --no-dynamic-linker \
+    --defsym=radv_EnumeratePhysicalDevices=0 --defsym=wsi_EnumeratePhysicalDevices=0 \
     --error-limit=0 -Map="$output.map" \
     --wrap=aligned_alloc --wrap=malloc --wrap=calloc --wrap=realloc --wrap=free \
     --wrap=posix_memalign --wrap=malloc_usable_size \
