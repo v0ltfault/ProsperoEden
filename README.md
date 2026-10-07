@@ -1,4 +1,4 @@
-> ## PS5 firmware 7.40 (and likely other 7.xx): the "can't protect" fix
+> ## PS5 firmware 7.40 and 7.61 (likely all 7.xx): the "can't protect" fix
 >
 > This fork of [blackbearreloaded/ProsperoEden](https://github.com/blackbearreloaded/ProsperoEden) carries a fix for
 > consoles where **every game ends a few seconds after it loads** with
@@ -13,8 +13,8 @@
 > Verified on a retail PS5 on 7.40 only: a large open-world game runs at its native 30 fps cap, un-jailbroken, as released.
 > The permission rule behind it is probably the same across the 7.x line, but that is an expectation, not a test result.
 > If you run this on 7.01, 7.20, 7.61 or another 7.x firmware, a note of what happened would firm this up.
-> **Reports so far:** 7.40 (owner) - games run. 7.61 (one user, 2026-10-07) - the app opens and reaches its setup
-> screen; a game run is not confirmed yet because that console's keys were older than its firmware dump.
+> **Reports so far:** 7.40 (owner) - games run. 7.61 (one user, 2026-10-07) - games run ("flawlessly", in their
+> words) once a keys/firmware mismatch on their side was sorted out. Two of the 7.x line so far; others still welcome.
 >
 > **"Firmware NCA validation failed (code 21)"** on the setup screen is not this bug: code 21 is Eden's
 > `ErrorMissingKeyAreaKey`, i.e. your `prod.keys` was dumped from an older Switch firmware than the firmware
