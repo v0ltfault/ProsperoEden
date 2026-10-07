@@ -10,7 +10,9 @@
 > - **What and why:** [docs/FW740.md](docs/FW740.md). Upstream pull request: [blackbearreloaded/ProsperoEden#28](https://github.com/blackbearreloaded/ProsperoEden/pull/28).
 > - **Build it yourself:** `.github/workflows/build-fw740.yml` builds on a GitHub-hosted ubuntu-24.04 runner.
 >
-> Verified on a retail PS5 on 7.40: a large open-world game runs at its native 30 fps cap, un-jailbroken, as released.
+> Verified on a retail PS5 on 7.40 only: a large open-world game runs at its native 30 fps cap, un-jailbroken, as released.
+> The permission rule behind it is probably the same across the 7.x line, but that is an expectation, not a test result.
+> If you run this on 7.01, 7.20, 7.61 or another 7.x firmware, a note of what happened would firm this up.
 
 <p align="center">
   <img src="sce_sys/icon0.png" width="128" alt="ProsperoEden icon">
