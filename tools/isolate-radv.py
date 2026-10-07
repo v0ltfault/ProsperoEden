@@ -9,6 +9,7 @@ from pathlib import Path
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 
 root = Path(__file__).resolve().parents[1]
@@ -49,7 +50,11 @@ mapping = output/'symbols.map'
 mapping.write_text(''.join(f'{s} eden_radv_private_{s}\n' for s in private))
 before = digest(source)
 target = output/source.name
-subprocess.run(['objcopy', '--redefine-syms='+str(mapping), str(source), str(target)], check=True)
+# GNU objcopy 2.42 (Ubuntu 24.04) drops the hidden visibility of the archive's undefined weak
+# entrypoint references while rewriting symbol tables; those then surface as dynamic imports
+# the native packager rejects. llvm-objcopy keeps st_other intact.
+objcopy = shutil.which('llvm-objcopy-18') or shutil.which('llvm-objcopy') or 'objcopy'
+subprocess.run([objcopy, '--redefine-syms='+str(mapping), str(source), str(target)], check=True)
 subprocess.run(['ranlib', str(target)], check=True)
 assert digest(source) == before, 'Input RADV archive changed'
 after_symbols = symbols(target)
