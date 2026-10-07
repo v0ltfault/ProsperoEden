@@ -1,0 +1,49 @@
+name: Build (macro JIT alias)
+
+# Builds the PPSA99008 app folder on a GitHub-hosted runner (make package; docs/BUILDING.md).
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h / /mnt
+
+      - uses: actions/checkout@v4
+        with:
+          path: ProsperoEden
+
+      - name: Host tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang-18 lld-18 llvm-18 cmake ninja-build ccache make nasm meson rsync git glslang-tools spirv-tools bison flex curl wget unzip tar python3 python3-venv python3-mako python3-yaml pkg-config autoconf automake libtool
+          cd ProsperoEden && make toolchain
+
+      - name: Dependencies
+        run: cd ProsperoEden && make deps && make deps-status
+
+      - name: Prepare (RADV, FFmpeg, SDK)
+        run: cd ProsperoEden && make prepare JOBS=4
+
+      - name: Build package
+        run: cd ProsperoEden && make package JOBS=4
+
+      - name: Package listing
+        run: ls -la ProsperoEden/build/release/PPSA99008 && ls -la ProsperoEden/build/headless-native/llvm-pie.elf
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PPSA99008
+          path: ProsperoEden/build/release/PPSA99008
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: symbols
+          path: ProsperoEden/build/headless-native/llvm-pie.elf
+          retention-days: 14

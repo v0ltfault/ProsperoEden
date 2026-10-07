@@ -8,6 +8,16 @@ macro(macro_replace old new)
     string(REPLACE "${old}" "${new}" macro_source "${macro_source}")
 endmacro()
 string(PREPEND macro_source "#include <exception>\n")
+# PS5: give the macro JIT the same separate RW/RX views as the CPU JIT (EdenJitAllocator), so it
+# never changes page permissions. Firmware 7.40 refuses mprotect(RX) on this memory for an app
+# that is not jailbroken, which killed the GPU worker with xbyak's "can't protect".
+string(PREPEND macro_source "#define EDEN_JIT_ALIAS_NATIVE 1\n#include \"${EDEN_PORT_DIR}/jit-allocator.h\"\n")
+macro_replace("        : Xbyak::CodeGenerator(MAX_CODE_SIZE, default_cg_mode)"
+    "        : Xbyak::CodeGenerator(MAX_CODE_SIZE, default_cg_mode, EdenJitAllocator())")
+macro_replace("    // Matching PROTECT_RE needed for W^X systems\n    setProtectMode(Xbyak::CodeArray::ProtectMode::PROTECT_RW);\n"
+    "    // The buffer is written through its RW view and run through its RX view: no mprotect.\n")
+macro_replace("    ready();\n    setProtectMode(Xbyak::CodeArray::ProtectMode::PROTECT_RE);\n"
+    "    ready();\n")
 macro_replace("        u32 carry_flag{};"
     "        u32 carry_flag{};\n        std::exception_ptr failure;\n        bool failed{};")
 macro_replace("    program(&state, parameters.data(), parameters.data() + parameters.size());"
