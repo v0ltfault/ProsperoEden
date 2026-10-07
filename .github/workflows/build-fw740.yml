@@ -18,6 +18,22 @@ jobs:
         with:
           path: ProsperoEden
 
+      - name: Restore build cache
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache
+            ProsperoEden/.deps
+            ProsperoEden/build/radv-isolated
+            ps5-native-app-boilerplate
+            mihawk-vulkan-review
+            mihawk-mesa-review
+            mihawk-sdk-review
+          key: pe-build-${{ hashFiles('ProsperoEden/tools/deps.json') }}-${{ github.run_id }}
+          restore-keys: |
+            pe-build-${{ hashFiles('ProsperoEden/tools/deps.json') }}-
+
       - name: Host tools
         run: |
           sudo apt-get update
@@ -34,6 +50,40 @@ jobs:
 
       - name: Build package
         run: cd ProsperoEden && make package JOBS=4
+
+      - name: Diagnostics
+        if: always()
+        run: |
+          cd ProsperoEden
+          mkdir -p diag
+          cp -a build/radv-isolated/manifest.json diag/ 2>/dev/null || true
+          grep -n EnumeratePhysicalDevices build/radv-isolated/symbols.map > diag/symbols-map-grep.txt 2>/dev/null || true
+          nm -g --format=posix build/radv-isolated/libvulkan_radeon.ps5.a 2>/dev/null | grep -E "EnumeratePhysicalDevices" > diag/isolated-nm.txt || true
+          nm -g --format=posix ../mihawk-vulkan-review/.deps/native/radv-release/lib/libvulkan_radeon.ps5.a 2>/dev/null | grep -E "EnumeratePhysicalDevices" > diag/release-nm.txt || true
+          f=$(ls build/headless-native/llvm-pie.elf 2>/dev/null || true); if [ -n "$f" ]; then llvm-readobj-18 --dyn-symbols "$f" | grep -B4 -A6 EnumeratePhysicalDevices > diag/elf-dynsym.txt || true; llvm-nm-18 "$f" | grep EnumeratePhysicalDevices > diag/elf-nm.txt || true; fi
+          cp -a build/headless-native/imports.txt diag/ 2>/dev/null || true
+          scratch=$(cat .local/headless-cache 2>/dev/null || true); if [ -n "$scratch" ]; then grep -rl "eden-headless" "$scratch"/build*/build.ninja 2>/dev/null | head -1 | xargs -r -I{} sh -c 'grep -A3 "LINK_FLAGS.*eden-headless\|build bin/eden-headless" {} | head -40' > diag/link-rule.txt || true; find "$scratch" -maxdepth 3 -name "*.ninja" > diag/ninja-files.txt 2>/dev/null || true; fi
+          which ld.lld ld.lld-18 prospero-clang > diag/tools.txt 2>&1 || true
+          ls -la diag
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: diag
+          path: ProsperoEden/diag
+
+      - name: Save build cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cache
+            ProsperoEden/.deps
+            ProsperoEden/build/radv-isolated
+            ps5-native-app-boilerplate
+            mihawk-vulkan-review
+            mihawk-mesa-review
+            mihawk-sdk-review
+          key: pe-build-${{ hashFiles('ProsperoEden/tools/deps.json') }}-${{ github.run_id }}
 
       - name: Package listing
         run: ls -la ProsperoEden/build/release/PPSA99008 && ls -la ProsperoEden/build/headless-native/llvm-pie.elf
