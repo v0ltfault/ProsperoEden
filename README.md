@@ -1,3 +1,5 @@
+> **Update (2026-10-09):** the real cause of the 7.40 "can't protect" crash is ShadowMountPlus pausing kstuff about 15 s after launch, not the firmware. kstuff is what makes `mprotect(PROT_EXEC)` work on 7.x. **Fix: add `kstuff_no_pause=PPSA99008` to `/data/shadowmount/config.ini`** (it reloads by itself); with that, the official releases work on 7.40 too. Details: blackbearreloaded/ProsperoEden#37 and #43.
+
 > ## PS5 firmware 7.40 and 7.61 (likely all 7.xx): the "can't protect" fix
 >
 > This fork of [blackbearreloaded/ProsperoEden](https://github.com/blackbearreloaded/ProsperoEden) carries a fix for
